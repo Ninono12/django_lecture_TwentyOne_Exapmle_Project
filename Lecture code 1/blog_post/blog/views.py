@@ -147,15 +147,20 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     def add_banner_image(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        image = serializer.validated_data.get('image')
-        file_path = default_storage.save(f"banner_image/{image.name}", ContentFile(image.read()))
 
-        add_banner_image.delay(image_url=file_path,
-                               blog_post_id=self.get_object().id)
+        image = serializer.validated_data.get('image')
+        if not image:
+            return Response(
+                {"error": "No image provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        file_path = default_storage.save(f"banner_image/{image.name}", ContentFile(image.read()))
+        add_banner_image.delay(image_url=file_path, blog_post_id=self.get_object().id)
         return Response(
             {'status': 'banner image successfully created'},
-            status=status.HTTP_200_OK)
-
+            status=status.HTTP_200_OK
+        )
     @action(detail=True, methods=['post'])
     def send_blog_post_to_email(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
