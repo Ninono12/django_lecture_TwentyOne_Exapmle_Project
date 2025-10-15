@@ -133,7 +133,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def delete_blog_post(self, request):
         delete_blog_post.delay()
-        return Response(data={'proces successfully started'}, status=status.HTTP_200_OK)
+        return Response(data={'process successfully started'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def reorder_blog_post(self, request):
@@ -162,7 +162,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         send_blog_post_to_email.delay(
             email=serializer.validated_data['email'], blog_post_id=self.get_object().id)
-        return Response(data={f'email sent to {serializer.data['email']}'}, status=status.HTTP_200_OK)
+        return Response(data={"message": f"email sent to {serializer.data['email']}"}, status=status.HTTP_200_OK)
 
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
